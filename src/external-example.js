@@ -1,5 +1,6 @@
 const readFileSync = require("fs").readFileSync;
 const path = require('path');
+const logger = require('jsdoc/util/logger');
 
 exports.defineTags = function(dictionary) {
 	dictionary.defineTag("externalExample", {
@@ -26,7 +27,8 @@ exports.defineTags = function(dictionary) {
 				try {
 					example = readFileSync(examplePath, "utf8")	
 				} catch(e) {
-					console.error(e)
+					logger.error('@externalExample: ' + e)
+					return
 				}
 				
 				
@@ -35,7 +37,8 @@ exports.defineTags = function(dictionary) {
 				try {
 					example = readFileSync(path.join(doclet.meta.path, examplePath), "utf8")
 				} catch(e) {
-					console.error(e)
+					logger.error('@externalExample: ' + e)
+					return
 				}
 					
 			}
