@@ -14,10 +14,6 @@ exports.defineTags = function(dictionary) {
  			}
 
 			let example = ""
-
-			console.log(tag)
-			console.log(doclet)
-			
 			examplePath = tag?.value
 			
 			if(!examplePath) {
@@ -27,13 +23,27 @@ exports.defineTags = function(dictionary) {
 			examplePath = path.normalize(examplePath.trim())
 			
 			if(path.isAbsolute(examplePath)) {
-				example = readFileSync(examplePath, "utf8")
+				try {
+					example = readFileSync(examplePath, "utf8")	
+				} catch(e) {
+					console.error(e)
+				}
+				
+				
 				
 			} else {
-				example = readFileSync(path.join(doclet.meta.path, examplePath), "utf8")
+				try {
+					example = readFileSync(path.join(doclet.meta.path, examplePath), "utf8")
+				} catch(e) {
+					console.error(e)
+				}
+					
 			}
 			
-			doclet.examples.push(example);
+			if(example!="") {
+				doclet.examples.push(example);	
+			}
+			
 		}
 	});
 };
