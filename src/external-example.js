@@ -1,33 +1,39 @@
-var readFileSync = require("fs").readFileSync;
-var baseDir = env.opts.query.externalExBase;
+const readFileSync = require("fs").readFileSync;
+const path = require('path');
 
 exports.defineTags = function(dictionary) {
 	dictionary.defineTag("externalExample", {
 		mustHaveValue: true,
 		isNamespace: false,
-		canHaveType: true,
+		canHaveType: false,
 		defaultValue: [],
 		onTagged: function(doclet, tag) {
-			var examples = doclet.externalExamples;
-			var example = {};
-			var names;
 
-			if (!examples) {
-				examples = doclet.externalExamples = [];
+ 			if (!doclet.examples) {
+ 				doclet.examples = [];
+ 			}
+
+			let example = ""
+
+			console.log(tag)
+			console.log(doclet)
+			
+			examplePath = tag?.value
+			
+			if(!examplePath) {
+				return;
 			}
 
-			names = tag.value.type && tag.value.type.names;
-			if (names) {
-				example.isRunnable = names.indexOf("runnable") > -1;
+			examplePath = path.normalize(examplePath.trim())
+			
+			if(path.isAbsolute(examplePath)) {
+				example = readFileSync(examplePath, "utf8")
+				
 			} else {
-				example.isRunnable = false;
+				example = readFileSync(path.join(doclet.meta.path, examplePath), "utf8")
 			}
-
-			example.src = readFileSync(
-				baseDir + "/" + tag.value.description + ".js",
-				"UTF-8"
-			);
-			examples.push(example);
+			
+			doclet.examples.push(example);
 		}
 	});
 };
